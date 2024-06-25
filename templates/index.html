@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Log In and Sign Up Form</title>
+    <link rel="stylesheet" href="login.css">
+    <script src="https://kit.fontawesome.com/2011a53249.js" crossorigin="anonymous"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="form-box">
+            <h1 id="title">Sign Up</h1>
+            <form id="userForm">
+                <input type="hidden" name="action" id="action" value="signup">
+                <div class="input-group">
+                    <div class="input-field" id="nameField">
+                        <i class="fa-solid fa-user"></i>
+                        <input type="text" placeholder="Name" name="name" required>
+                    </div>
+                    <div class="input-field">
+                        <i class="fa-solid fa-envelope"></i>
+                        <input type="email" placeholder="Email" name="email" required>
+                    </div>
+                    <div class="input-field">
+                        <i class="fa-solid fa-lock"></i>
+                        <input type="password" placeholder="Password" name="password" required>
+                    </div>
+                </div>
+                <div class="btn-field">
+                    <button type="button" id="signupBtn">Sign Up</button>
+                    <button type="button" id="loginBtn" class="disable">Log In</button>
+                </div>
+                <button type="submit" class="submitBtn">Submit</button>
+            </form>
+        </div>
+    </div>
+    <script>
+        const signupBtn = document.getElementById("signupBtn");
+        const loginBtn = document.getElementById("loginBtn");
+        const nameField = document.getElementById("nameField");
+        const title = document.getElementById("title");
+        const userForm = document.getElementById("userForm");
+        const actionInput = document.getElementById("action");
+
+        loginBtn.onclick = function() {
+            nameField.style.maxHeight = "0";
+            title.innerHTML = "Log In";
+            signupBtn.classList.add("disable");
+            loginBtn.classList.remove("disable");
+            actionInput.value = "login";
+        }
+
+        signupBtn.onclick = function() {
+            nameField.style.maxHeight = "50px";
+            title.innerHTML = "Sign Up";
+            signupBtn.classList.remove("disable");
+            loginBtn.classList.add("disable");
+            actionInput.value = "signup";
+        }
+
+        userForm.onsubmit = async function(event) {
+            event.preventDefault();
+            const formData = new FormData(userForm);
+            const data = {
+                action: formData.get('action'),
+                name: formData.get('name'),
+                email: formData.get('email'),
+                password: formData.get('password')
+            };
+
+            try {
+                const response = await fetch('/submit_form', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    if (result.message === 'Log in successful!') {
+                        localStorage.setItem('user', JSON.stringify(result.user));
+                        localStorage.setItem('userEmail', data.email);
+                        window.location.href = result.redirectUrl;
+                        alert("Log in successful!");
+                    } else {
+                        alert(result.message);
+                        if (result.redirectUrl) {
+                            window.location.href = result.redirectUrl;
+                        }
+                    }
+                } else {
+                    const errorText = await response.text();
+                    throw new Error(errorText);
+                }
+            } catch (error) {
+                alert('Error submitting form: ' + error.message);
+                console.error('Error:', error);
+            }
+        };
+    </script>
+</body>
+</html>
