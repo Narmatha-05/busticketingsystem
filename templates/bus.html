@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Departure selection</title>
+    <link rel="stylesheet" href="bus.css">
+</head>
+<body>
+    <h1 class="title">Welcome to Lightning Bus</h1>
+    <form id="searchForm">
+        <label for="state">Departure</label>
+        <select id="state" name="state">
+            <option hidden selected>From</option>
+            <option value="Selangor">Selangor</option>
+            <option value="Johor Baharu">Johor Baharu</option>
+            <option value="Penang">Penang</option>
+            <option value="Pahang">Pahang</option>
+            <option value="Perak">Perak</option>
+            <option value="Perlis">Perlis</option>
+            <option value="Kedah">Kedah</option>
+            <option value="Kelantan">Kelantan</option>
+            <option value="Terengganu">Terengganu</option>
+            <option value="Negeri Sembilan">Negeri Sembilan</option>
+        </select>
+        <label for="wait">Arrival</label>
+        <select id="wait" name="wait">
+            <option hidden selected>To</option>
+            <option value="Selangor">Selangor</option>
+            <option value="Johor Baharu">Johor Baharu</option>
+            <option value="Penang">Penang</option>
+            <option value="Pahang">Pahang</option>
+            <option value="Perak">Perak</option>
+            <option value="Perlis">Perlis</option>
+            <option value="Kedah">Kedah</option>
+            <option value="Kelantan">Kelantan</option>
+            <option value="Terengganu">Terengganu</option>
+            <option value="Negeri Sembilan">Negeri Sembilan</option>
+        </select>
+        <label for="date">Departure date</label>
+        <input type="date" id="date" name="date">
+        <input type="submit" value="Search" id="mysubmit">
+    </form>
+    
+    <table id="busInfo" style="width:100%">
+        <thead>
+            <tr>
+                <th>Bus number</th>
+                <th>Departure and departure terminal</th>
+                <th>Duration</th>
+                <th>Arrival terminal and estimated arrival time</th>
+                <th>Fare</th>
+                <th>Seat availability</th>
+                <th>Choose seat</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Bus info will be dynamically inserted here -->
+        </tbody>
+    </table>
+
+
+    
+    <script>
+
+    function selectSeat(busNumber, date) {
+        // Redirect to seat.html with parameters
+        window.location.href = `/seat?busNumber=${encodeURIComponent(busNumber)}&date=${encodeURIComponent(date)}`;
+    }
+
+
+
+document.getElementById('searchForm').addEventListener('submit', function(event) {
+    event.preventDefault(); // Prevent default form submission
+
+    const formData = new FormData(event.target);
+    const params = new URLSearchParams(formData).toString();
+
+    fetch(`/submit?${params}`)
+        .then(response => response.json())
+        .then(data => {
+            const tableBody = document.querySelector('#busInfo tbody');
+            tableBody.innerHTML = ''; // Clear previous results
+            
+            if (data.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="7">No buses found for the selected route and date.</td></tr>';
+            } else {
+                data.forEach(bus => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${bus.busNumber}</td>
+                        <td>${bus.departureTerminal}</td>
+                        <td>${bus.duration}</td>
+                        <td>${bus.arrivalTerminal}</td>
+                        <td>${bus.fare}</td>
+                        <td>${bus.seatAvailability}</td>
+                        <td><button onclick="selectSeat('${bus.busNumber}', '${bus.date}')">Select Seat</button></td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching data:', error);
+        });
+});
+
+    </script>
+</body>
+</html>

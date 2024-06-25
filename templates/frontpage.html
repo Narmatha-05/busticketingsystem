@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="frontpage.css">
+    <title>Lightning Bus</title>
+</head>
+<body>
+    <div class="container">
+        <div class="content">
+            <div class="header">
+                <div class="logo">LIGHTNING BUS</div>
+                <ul class="navigation">
+                    <li><a href="/Profile">Profile</a></li>
+                    <li><a href="/FAQ">FAQ</a></li>
+                    <li><a href="/bus">Bus Online Ticket</a></li>
+                    <li><a href="#" onclick="logout()">Logout</a></li>
+                </ul>
+            </div>
+            <h1>WE MAKE BUS TRAVEL EASY AND AFFORDABLE</h1>
+            <img src="frontpagebus.jpeg" alt="Bus" class="bus-image">
+            <div class="features">
+                <div class="feature">
+                    <h3>ELECTRIC M-TICKET</h3>
+                    <p>Easy and convenient ticketing</p>
+                </div>
+                <div class="feature">
+                    <h3>ALWAYS ON TIME, WIFI</h3>
+                    <p>Reliable and connected travel</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function logout() {
+            localStorage.removeItem('user');
+            alert("Logged out");
+            window.location.href = "/";
+        }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        // Assuming user data is already stored in localStorage during login
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (!user) {
+            window.location.href = '/'; // Redirect to login if user data is not available
+        }
+    });
+
+    
+    </script>
+</body>
+</html>

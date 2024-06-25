@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice</title>
+    <link rel="stylesheet" href="invoice.css">
+</head>
+<body>
+    <div class="receipt">
+        <h2>Invoice</h2>
+        <div id="successMessage" class="success-message">Payment successfully done</div>
+        <table class="receipt">
+            <thead>
+                <tr>
+                    <th>Seat</th>
+                    <th>Name</th>
+                    <th>Age</th>
+                    <th>Ticket Price (MYR)</th>
+                    <th>Food Order</th>
+                    <th>Total Amount (MYR)</th>
+                </tr>
+            </thead>
+            <tbody id="invoice-body">
+                <!-- Data rows will be inserted here dynamically -->
+            </tbody>
+        </table>
+        <div class="receipt">
+            <h3>Total Amount to be paid: MYR <span id="totalAmount"></span></h3>
+        </div>
+        <br>
+        <button onclick="window.print()">Generate PDF</button><button onclick="goToFrontpage()">Back to Frontpage</button>
+
+    </div>
+    <script>
+        function goToFrontpage() {
+            window.location.href = "/frontpage";
+        }        
+
+        
+    </script>
+</body>
+</html>
