@@ -80,16 +80,13 @@
 
                 if (response.ok) {
                     const result = await response.json();
-
-                    // Handle successful login
                     if (result.message === 'Log in successful!') {
                         localStorage.setItem('user', JSON.stringify(result.user));
-                        alert("Log in successful!");
+                        localStorage.setItem('userEmail', data.email);
                         window.location.href = result.redirectUrl;
+                        alert("Log in successful!");
                     } else {
                         alert(result.message);
-
-                        // Redirect to frontpage.html after successful sign-up
                         if (result.redirectUrl) {
                             window.location.href = result.redirectUrl;
                         }
