@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="Profile.css">
+    <title>User Profile</title>
+</head>
+<body>
+    <div class="profile-container">
+        <nav>
+            <img src="profile.png" class="logo">
+        </nav>
+        
+    <div class="container">
+        <h1>My Profile</h1>
+        <form id="profile-form">
+            <div>
+                <label for="name">Name:</label>
+                <input type="text" id="name" name="name" readonly>
+            </div>
+            <div>
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" readonly>
+            </div>
+            <div>
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" readonly>
+            </div>
+            <div>
+                <label for="birthdate">Birth Date:</label>
+                <input type="date" id="birthdate" name="birthdate" readonly>
+            </div>
+            <div>
+                <label for="gender">Gender:</label>
+                <select id="gender" name="gender" disabled>
+                    <option value="">Select Gender</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+            <div>
+                <label for="phone">Mobile Number:</label>
+                <input type="text" id="phone" name="phone" readonly>
+            </div>
+            <button type="button" id="edit-button">Edit</button>
+            <button type="button" id="save-button" style="display:none;">Save</button>
+            <button type="button" onclick="window.location.href='/frontpage'">Back to Home</button>
+        </form>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Load user data
+            const user = JSON.parse(localStorage.getItem('user'));
+            if (user) {
+                document.getElementById('name').value = user.name;
+                document.getElementById('email').value = user.email;
+                document.getElementById('password').value = user.password;
+                document.getElementById('birthdate').value = user.birthdate || '';
+                document.getElementById('gender').value = user.gender || '';
+                document.getElementById('phone').value = user.phone || '';
+            } else {
+                window.location.href = '/'; // Redirect to login if user data is not available
+            }
+        });
+
+        document.getElementById('edit-button').addEventListener('click', function() {
+            document.getElementById('name').readOnly = false;
+            document.getElementById('email').readOnly = false;
+            document.getElementById('password').readOnly = false;
+            document.getElementById('birthdate').readOnly = false;
+            document.getElementById('gender').disabled = false;
+            document.getElementById('phone').readOnly = false;
+            document.getElementById('save-button').style.display = 'inline';
+            this.style.display = 'none';
+        });
+
+        document.getElementById('save-button').addEventListener('click', function() {
+            const user = {
+                name: document.getElementById('name').value,
+                email: document.getElementById('email').value,
+                password: document.getElementById('password').value,
+                birthdate: document.getElementById('birthdate').value,
+                gender: document.getElementById('gender').value,
+                phone: document.getElementById('phone').value
+            };
+            
+            fetch('/updateProfile', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(user)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Profile updated successfully!');
+                    localStorage.setItem('user', JSON.stringify(user));
+                    window.location.href = '/frontpage';
+                } else {
+                    alert('Failed to update profile.');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

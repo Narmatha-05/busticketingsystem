@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bus Seat Booking</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="seat.css">
+</head>
+<body>
+  <div class="center">
+    <div class="tickets">
+      <div class="ticket-selector">
+        <div class="head">
+          <div class="title">Bus Seat Booking</div>
+        </div>
+        <div class="seats">
+          <div class="status">
+            <div class="item">Available</div>
+            <div class="item">Booked</div>
+            <div class="item">Selected</div>
+          </div>
+          <div class="all-seats"></div>
+        </div>
+      </div>
+      <div class="price">
+        <div class="total">
+          <span> <span class="count">0</span> Seats Selected</span>
+        </div>
+        <button id="proceedBtn" type="button">Proceed to Book</button>
+      </div>
+    </div>
+  </div>
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const busNumber = urlParams.get('busNumber');
+    const date = urlParams.get('date');
+
+    let seats = document.querySelector(".all-seats");
+    let rows = 20;
+    let seatsPerRow = 4;
+
+    for (let row = 1; row <= rows; row++) {
+      for (let seat = 0; seat < seatsPerRow / 2; seat++) {
+        let seatLabel = seat === 0 ? "A" : "B";
+        let seatId = `${row}${seatLabel}`;
+        seats.insertAdjacentHTML(
+          "beforeend",
+          `<input type="checkbox" name="tickets" id="${seatId}" />
+           <label for="${seatId}" class="seat">${seatId}</label>`
+        );
+      }
+
+      seats.insertAdjacentHTML(
+        "beforeend",
+        `<div class="gap"></div>`
+      );
+
+      for (let seat = 0; seat < seatsPerRow / 2; seat++) {
+        let seatLabel = seat === 0 ? "C" : "D";
+        let seatId = `${row}${seatLabel}`;
+        seats.insertAdjacentHTML(
+          "beforeend",
+          `<input type="checkbox" name="tickets" id="${seatId}" />
+           <label for="${seatId}" class="seat">${seatId}</label>`
+        );
+      }
+    }
+
+    window.onload = function() {
+    fetch(`/bookedSeats?busNumber=${encodeURIComponent(busNumber)}&date=${encodeURIComponent(date)}`)
+        .then(response => response.json())
+        .then(bookedSeats => {
+            console.log('Booked seats:', bookedSeats);
+            bookedSeats.forEach(seatId => {
+                const seatElement = document.getElementById(seatId);
+                if (seatElement) {
+                    seatElement.checked = true;
+                    seatElement.disabled = true;
+                    // Add the 'booked' class to the label
+                    const label = document.querySelector(`label[for="${seatId}"]`);
+                    if (label) {
+                        label.classList.add('booked');
+                    }
+                }
+            });
+        })
+        .catch(error => {
+            console.error('Error fetching booked seats:', error);
+        });
+};
+
+let tickets = seats.querySelectorAll("input:not(:disabled)");
+let countDisplay = document.querySelector(".count");
+
+tickets.forEach((ticket) => {
+  ticket.addEventListener("change", () => {
+    let count = 0;
+    tickets.forEach((ticket) => {
+      if (ticket.checked && !ticket.disabled) {
+        count += 1;
+      }
+    });
+    countDisplay.textContent = count;
+  });
+});
+
+    document.getElementById("proceedBtn").addEventListener("click", function() {
+        let selectedSeats = Array.from(document.querySelectorAll('input[type="checkbox"]:checked:not(:disabled)')).map(seat => seat.id);
+        
+        if (selectedSeats.length === 0) {
+            alert('Please select at least one seat to proceed.');
+            return;
+        }
+
+        fetch('/saveSeats', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ selectedSeats: selectedSeats, busNumber: busNumber, date: date })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.error) {
+                alert(`Some seats are no longer available: ${data.conflictingSeats.join(', ')}. Please select different seats.`);
+                location.reload();
+            } else if (data.redirectUrl) {
+                window.location.href = data.redirectUrl;
+            } else {
+                throw new Error('Unexpected server response');
+            }
+        })
+        .catch(error => {
+            console.error('Error saving seats:', error);
+            alert('Failed to save seats. Please try again.');
+        });
+    });
+  </script>      
+</body>
+</html>

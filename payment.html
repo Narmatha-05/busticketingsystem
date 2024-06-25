@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Gateway</title>
+    <link rel="stylesheet" href="payment.css">
+</head>
+<body>
+
+<div class="container">
+    <h2 class="mainhead"><b><u>Payment Form</u></b></h2>
+    <form id="paymentForm" action="/payment" method="post" onsubmit="return validate()">
+        <h3>Payment Info</h3>
+        <div class="payment-methods">
+            <label><input type="radio" name="paymentMethod" value="creditCard" onclick="showPaymentFields()" required> Credit Card</label>
+            <label><input type="radio" name="paymentMethod" value="debitCard" onclick="showPaymentFields()"> Debit Card</label>
+            <label><input type="radio" name="paymentMethod" value="wallet" onclick="showPaymentFields()"> Wallet</label>
+            <label><input type="radio" name="paymentMethod" value="fpx" onclick="showPaymentFields()"> Malaysia Online Bank Transfer (FPX)</label>
+        </div>
+        <br>
+        <div id="creditCardFields" style="display: none;">
+            <label for="cardNumber_id">Card Number:</label>
+            <input type="text" name="cardNumber_name" id="cardNumber_id" placeholder="1111222233334444" minlength="16" maxlength="16">
+            <label for="exDate_id">Expiry Date:</label>
+            <input type="date" name="exDate_name" id="exDate_id">
+            <label for="cvvPass_id">CVV:</label>
+            <input type="password" name="cvvPass_name" id="cvvPass_id" placeholder="123" minlength="3" maxlength="3">
+            <label><input type="checkbox" name="saveCard" value="yes"> Save your card for future purchases</label>
+        </div>
+        <div id="walletFields" style="display: none;">
+            <label for="walletProvider">Wallet Provider:</label>
+            <select name="walletProvider" id="walletProvider">
+                <option value="">--Select Wallet--</option>
+                <option value="PayPal">PayPal</option>
+                <option value="GooglePay">Google Pay</option>
+                <option value="ApplePay">Apple Pay</option>
+                <option value="TouchNGo">Touch 'n Go</option>
+                <option value="GrabPay">GrabPay</option>
+            </select>
+        </div>
+        <div id="fpxFields" style="display: none;">
+            <label for="fpxBank">Bank:</label>
+            <select name="fpxBank" id="fpxBank">
+                <option value="">--Select Bank--</option>
+                <option value="Maybank">Maybank</option>
+                <option value="CIMB Bank">CIMB Bank</option>
+                <option value="Public Bank">Public Bank</option>
+                <option value="RHB Bank">RHB Bank</option>
+                <option value="Hong Leong Bank">Hong Leong Bank</option>
+                <option value="AmBank">AmBank</option>
+                <option value="UOB Malaysia">UOB Malaysia</option>
+                <option value="Bank Islam">Bank Islam</option>
+                <option value="OCBC Bank">OCBC Bank</option>
+                <option value="HSBC Bank Malaysia">HSBC Bank Malaysia</option>
+                <option value="Bank Rakyat">Bank Rakyat</option>
+                <option value="Affin Bank">Affin Bank</option>
+                <option value="Alliance Bank">Alliance Bank</option>
+            </select>
+        </div>
+        <br>
+        <div class="submit-reset">
+            <input type="submit" value="Pay Now">
+            <input type="reset" value="Reset">
+        </div>
+    </form>
+</div>
+
+<script>
+    function clearCreditCardFields() {
+        document.getElementById("cardNumber_id").value = "";
+        document.getElementById("cvvPass_id").value = "";
+        document.getElementById("exDate_id").value = "";
+    }
+
+    function validate() {
+        var paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
+
+        if (paymentMethod === "creditCard" || paymentMethod === "debitCard") {
+            var cardNumber = document.getElementById("cardNumber_id").value;
+            var cvv = document.getElementById("cvvPass_id").value;
+
+            if (isNaN(cardNumber) || cardNumber.length !== 16) {
+                alert("Please enter a valid 16-digit card number.");
+                return false;
+            }
+            if (isNaN(cvv) || cvv.length !== 3) {
+                alert("Please enter a valid 3-digit CVV.");
+                return false;
+            }
+        }
+
+        var expiryDate = document.getElementById("exDate_id").value;
+
+        var currentDate = new Date();
+        var inputDate = new Date(expiryDate);
+        if (inputDate < currentDate) {
+            alert("Please enter a valid future card expiry date.");
+            return false;
+        }
+
+        return true;
+    }
+
+    function showPaymentFields() {
+        var paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
+        var creditCardFields = document.getElementById("creditCardFields");
+        var walletFields = document.getElementById("walletFields");
+        var fpxFields = document.getElementById("fpxFields");
+
+        if (paymentMethod === "creditCard" || paymentMethod === "debitCard") {
+            creditCardFields.style.display = "block";
+        } else {
+            creditCardFields.style.display = "none";
+            clearCreditCardFields(); 
+        }
+
+        walletFields.style.display = paymentMethod === "wallet" ? "block" : "none";
+        fpxFields.style.display = paymentMethod === "fpx" ? "block" : "none";
+    }
+</script>
+
+</body>
+</html>
