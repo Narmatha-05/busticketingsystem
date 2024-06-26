@@ -48,7 +48,7 @@ function sanitizeJSON(data) {
 
 // Serve HTML files from the 'templates' folder
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'templates', 'login.html'));
+    res.sendFile(path.join(__dirname, 'templates', 'index.html'));
 });
 
 app.post('/submit_form', (req, res) => {
